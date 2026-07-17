@@ -1,0 +1,108 @@
+[general]
+app_name = "SecurePacketAnalyzerPro"
+version = "1.0.0"
+language = "en"
+first_run = true
+
+[appearance]
+theme = "dark"
+font_family = "Segoe UI"
+font_size = 12
+icon_size = 24
+scaling = 1.0
+accent_color = "#0078D4"
+show_toolbar = true
+show_sidebar = true
+sidebar_collapsed = false
+animate_transitions = true
+
+[accessibility]
+screen_reader = false
+keyboard_navigation = true
+high_contrast = false
+reduced_motion = false
+large_ui = false
+large_cursor = false
+color_blind_mode = "none"
+text_scale = 1.0
+icon_scale = 1.0
+focus_indicators = true
+accessible_tooltips = true
+wcag_level = "AA"
+
+[capture]
+interface = ""
+promiscuous = true
+filter = ""
+max_packets = 0
+timeout = 0
+buffer_size = 65536
+auto_scroll = true
+
+[workspace]
+active_workspace = "default"
+auto_save = true
+save_interval = 300
+
+[logging]
+level = "INFO"
+max_size_mb = 50
+backup_count = 5
+log_to_file = true
+log_to_console = true
+performance_logging = false
+security_logging = true
+
+[notifications]
+enabled = true
+show_info = true
+show_warnings = true
+show_errors = true
+show_security = true
+sound_enabled = false
+timeout_seconds = 5
+
+[plugins]
+enabled = true
+auto_load = true
+sandbox_mode = true
+api_version = "1.0.0"
+
+[performance]
+max_memory_mb = 2048
+worker_threads = 4
+cache_size_mb = 256
+lazy_loading = true
+background_init = true
+
+[privacy]
+telemetry_enabled = false
+analytics_enabled = false
+external_connections = false
+crash_reports = false
+
+[updates]
+auto_check = true
+channel = "stable"
+server_url = ""
+download_dir = ""
+
+[backup]
+auto_backup = false
+backup_interval_hours = 24
+max_backups = 10
+include_settings = true
+include_workspaces = true
+include_cases = true
+include_reports = true
+include_plugins = true
+include_notes = true
+include_bookmarks = true
+compression_level = 6
+
+[diagnostics]
+auto_run_on_startup = false
+log_level = "INFO"
+performance_monitoring = true
+performance_interval_seconds = 1
+performance_history_size = 600
