@@ -7,7 +7,7 @@ import logging
 import shutil
 import threading
 import zipfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any
@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class BackupType(Enum):
     """High-level classification of backup scope."""
 
@@ -38,6 +39,7 @@ class BackupType(Enum):
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BackupEntry:
@@ -107,6 +109,7 @@ class BackupEntry:
 # ---------------------------------------------------------------------------
 # Backup manager
 # ---------------------------------------------------------------------------
+
 
 class BackupManager:
     """Manages creation, restoration, and lifecycle of application backups.
@@ -203,7 +206,6 @@ class BackupManager:
         BackupEntry or None
             The created entry, or *None* on failure.
         """
-        import hashlib
         import uuid
 
         flags = self._resolve_includes(backup_type, includes)
@@ -474,7 +476,6 @@ class BackupManager:
         BackupEntry or None
             The imported entry, or *None* on failure.
         """
-        import hashlib
         import uuid
 
         if not backup_path.exists():
@@ -633,19 +634,19 @@ class BackupManager:
         }
 
         if backup_type == BackupType.SETTINGS_ONLY:
-            defaults = {k: False for k in defaults}
+            defaults = dict.fromkeys(defaults, False)
             defaults["settings"] = True
         elif backup_type == BackupType.WORKSPACE_ONLY:
-            defaults = {k: False for k in defaults}
+            defaults = dict.fromkeys(defaults, False)
             defaults["workspaces"] = True
         elif backup_type == BackupType.DATA_ONLY:
-            defaults = {k: False for k in defaults}
+            defaults = dict.fromkeys(defaults, False)
             defaults["cases"] = True
             defaults["reports"] = True
             defaults["notes"] = True
             defaults["bookmarks"] = True
         elif backup_type == BackupType.CUSTOM:
-            defaults = {k: False for k in defaults}
+            defaults = dict.fromkeys(defaults, False)
 
         if overrides:
             defaults.update(overrides)

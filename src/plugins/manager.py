@@ -8,7 +8,6 @@ import threading
 from pathlib import Path
 from typing import Any
 
-from src.analysis.models import _now_iso
 from src.plugins.base import (
     PluginBase,
     PluginMetadata,
@@ -109,9 +108,7 @@ class PluginManager:
                 self._metadata[metadata.id] = metadata
                 new_count += 1
 
-            logger.debug(
-                "Discovered plugin: %s (%s)", metadata.name, metadata.id
-            )
+            logger.debug("Discovered plugin: %s (%s)", metadata.name, metadata.id)
 
         return new_count
 
@@ -256,9 +253,7 @@ class PluginManager:
             try:
                 plugin.on_config_changed(stored_config)
             except Exception:
-                logger.exception(
-                    "Plugin %s raised during on_config_changed()", metadata.name
-                )
+                logger.exception("Plugin %s raised during on_config_changed()", metadata.name)
 
         try:
             plugin.on_enable()
@@ -302,16 +297,12 @@ class PluginManager:
         try:
             plugin.on_disable()
         except Exception:
-            logger.exception(
-                "Plugin %s raised during on_disable()", metadata.name
-            )
+            logger.exception("Plugin %s raised during on_disable()", metadata.name)
 
         try:
             plugin.shutdown()
         except Exception:
-            logger.exception(
-                "Plugin %s raised during shutdown()", metadata.name
-            )
+            logger.exception("Plugin %s raised during shutdown()", metadata.name)
 
         self._loader.unload_plugin(plugin_id)
 
@@ -398,18 +389,13 @@ class PluginManager:
             A :class:`PluginCategory` member value.
         """
         with self._lock:
-            return [
-                meta for meta in self._metadata.values()
-                if meta.category == category
-            ]
+            return [meta for meta in self._metadata.values() if meta.category == category]
 
     # ------------------------------------------------------------------
     # Configuration
     # ------------------------------------------------------------------
 
-    def set_config(
-        self, plugin_id: str, config: dict[str, Any]
-    ) -> bool:
+    def set_config(self, plugin_id: str, config: dict[str, Any]) -> bool:
         """Update a plugin's configuration.
 
         Validates the new configuration against the plugin's schema and
@@ -569,9 +555,7 @@ class PluginManager:
 
         self._save_configs()
         self._event_bus.emit(Events.PLUGIN_UPDATED, new_metadata.to_dict())
-        logger.info(
-            "Updated plugin: %s (%s)", new_metadata.name, new_metadata.id
-        )
+        logger.info("Updated plugin: %s (%s)", new_metadata.name, new_metadata.id)
         return True
 
     # ------------------------------------------------------------------
@@ -587,14 +571,8 @@ class PluginManager:
         with self._lock:
             all_meta = list(self._metadata.values())
 
-        enabled = sum(
-            1 for m in all_meta
-            if m.state == PluginState.ENABLED
-        )
-        errored = sum(
-            1 for m in all_meta
-            if m.state == PluginState.ERROR
-        )
+        enabled = sum(1 for m in all_meta if m.state == PluginState.ENABLED)
+        errored = sum(1 for m in all_meta if m.state == PluginState.ERROR)
         total = len(all_meta)
         disabled = total - enabled - errored
 

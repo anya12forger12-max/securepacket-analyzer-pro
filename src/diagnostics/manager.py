@@ -13,8 +13,7 @@ import platform
 import shutil
 import sqlite3
 import sys
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -282,7 +281,7 @@ class DiagnosticsManager:
     def check_scapy(self) -> DiagnosticResult:
         """Verify that Scapy is importable and usable."""
         try:
-            import scapy  # noqa: F401
+            import scapy
 
             version = getattr(scapy, "VERSION", "unknown")
             return DiagnosticResult(

@@ -11,7 +11,7 @@ import logging
 import threading
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -74,9 +74,7 @@ class Notification:
     title: str = ""
     message: str = ""
     notification_type: NotificationType = NotificationType.INFO
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     read: bool = False
     dismissed: bool = False
     actions: list[dict[str, str]] = field(default_factory=list)
@@ -111,7 +109,7 @@ class Notification:
             title=data.get("title", ""),
             message=data.get("message", ""),
             notification_type=ntype,
-            timestamp=data.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            timestamp=data.get("timestamp", datetime.now(UTC).isoformat()),
             read=data.get("read", False),
             dismissed=data.get("dismissed", False),
             actions=data.get("actions", []),
@@ -178,7 +176,9 @@ class NotificationManager(QObject):
         Notification
             The newly created notification object.
         """
-        ntype_key = f"show_{ntype.value}s" if ntype != NotificationType.SECURITY else "show_security"
+        ntype_key = (
+            f"show_{ntype.value}s" if ntype != NotificationType.SECURITY else "show_security"
+        )
 
         # Check if this notification type is enabled
         notifications_cfg = self._settings.as_dict("notifications")

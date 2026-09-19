@@ -111,8 +111,7 @@ class FontManager:
 
         font = QFont(family, size)
         font.setStyleStrategy(
-            QFont.StyleStrategy.PreferAntialias
-            | QFont.StyleStrategy.PreferQuality
+            QFont.StyleStrategy.PreferAntialias | QFont.StyleStrategy.PreferQuality
         )
         return font
 
@@ -162,8 +161,7 @@ class FontManager:
         clamped = max(self._MIN_SIZE, min(self._MAX_SIZE, size))
         if clamped != size:
             raise ValueError(
-                f"Font size must be between {self._MIN_SIZE} and "
-                f"{self._MAX_SIZE}, got {size}"
+                f"Font size must be between {self._MIN_SIZE} and " f"{self._MAX_SIZE}, got {size}"
             )
         self._set_setting("font/size", clamped)
 
@@ -197,8 +195,7 @@ class FontManager:
 
         for category, default_family in fonts.items():
             available = [
-                f for f in self._font_database.families()
-                if default_family.lower() in f.lower()
+                f for f in self._font_database.families() if default_family.lower() in f.lower()
             ]
             if available:
                 result[category] = available[0]
@@ -335,10 +332,14 @@ class FontManager:
             fallbacks = {
                 "sans": ["Ubuntu", "DejaVu Sans", "Liberation Sans", "Arial"],
                 "serif": [
-                    "Liberation Serif", "DejaVu Serif", "Times New Roman",
+                    "Liberation Serif",
+                    "DejaVu Serif",
+                    "Times New Roman",
                 ],
                 "mono": [
-                    "Liberation Mono", "DejaVu Sans Mono", "Consolas",
+                    "Liberation Mono",
+                    "DejaVu Sans Mono",
+                    "Consolas",
                 ],
                 "ui": ["Ubuntu", "DejaVu Sans", "Liberation Sans"],
             }

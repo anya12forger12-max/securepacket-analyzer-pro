@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any
 
@@ -26,6 +26,7 @@ except ImportError:
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class PerformanceLevel(Enum):
     """Severity classification for system resource usage."""
 
@@ -38,6 +39,7 @@ class PerformanceLevel(Enum):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PerformanceSnapshot:
@@ -312,7 +314,7 @@ class PerformanceMonitor:
         with self._lock:
             self._snapshots.append(snapshot)
             if len(self._snapshots) > self._max_snapshots:
-                self._snapshots = self._snapshots[-self._max_snapshots:]
+                self._snapshots = self._snapshots[-self._max_snapshots :]
 
         return snapshot
 
@@ -332,11 +334,7 @@ class PerformanceMonitor:
             if threshold is None or value < threshold:
                 continue
 
-            level = (
-                PerformanceLevel.CRITICAL
-                if value >= threshold * 1.2
-                else PerformanceLevel.HIGH
-            )
+            level = PerformanceLevel.CRITICAL if value >= threshold * 1.2 else PerformanceLevel.HIGH
             msg = f"{label} at {value:.1f} (threshold: {threshold:.1f})"
 
             alert = PerformanceAlert(
@@ -351,9 +349,13 @@ class PerformanceMonitor:
             with self._lock:
                 self._alerts.append(alert)
                 if len(self._alerts) > self._max_alerts:
-                    self._alerts = self._alerts[-self._max_alerts:]
+                    self._alerts = self._alerts[-self._max_alerts :]
 
-            event = Events.PERFORMANCE_CRITICAL if level == PerformanceLevel.CRITICAL else Events.PERFORMANCE_WARNING
+            event = (
+                Events.PERFORMANCE_CRITICAL
+                if level == PerformanceLevel.CRITICAL
+                else Events.PERFORMANCE_WARNING
+            )
             self._event_bus.emit(event, alert.to_dict())
             logger.warning("Performance alert: %s", msg)
 
@@ -499,7 +501,9 @@ class PerformanceMonitor:
         if latest is not None:
             lines.append("  Latest Snapshot:")
             lines.append(f"    CPU             : {latest.cpu_percent:.1f}%")
-            lines.append(f"    System Memory   : {latest.memory_mb:.1f} MB ({latest.memory_percent:.1f}%)")
+            lines.append(
+                f"    System Memory   : {latest.memory_mb:.1f} MB ({latest.memory_percent:.1f}%)"
+            )
             lines.append(f"    App Memory      : {latest.app_memory_mb:.1f} MB")
             lines.append(f"    Threads         : {latest.thread_count}")
             lines.append(f"    Open Files      : {latest.open_files}")

@@ -6,8 +6,6 @@ definition, validation, conflict detection, and import/export.
 
 from __future__ import annotations
 
-from typing import Any
-
 
 class ShortcutManager:
     """Manages keyboard shortcuts for the application.
@@ -40,19 +38,15 @@ class ShortcutManager:
         "command_palette": ("Ctrl+Shift+P", "Command Palette"),
     }
 
-    _MODIFIER_PARTS: frozenset[str] = frozenset(
-        {"Ctrl", "Alt", "Shift", "Meta", "Cmd", "Super"}
-    )
+    _MODIFIER_PARTS: frozenset[str] = frozenset({"Ctrl", "Alt", "Shift", "Meta", "Cmd", "Super"})
 
     def __init__(self) -> None:
         """Initialize the shortcut manager with default shortcuts."""
         self._shortcuts: dict[str, tuple[str, str]] = {
-            action: (shortcut, desc)
-            for action, (shortcut, desc) in self._DEFAULTS.items()
+            action: (shortcut, desc) for action, (shortcut, desc) in self._DEFAULTS.items()
         }
         self._defaults: dict[str, tuple[str, str]] = {
-            action: (shortcut, desc)
-            for action, (shortcut, desc) in self._DEFAULTS.items()
+            action: (shortcut, desc) for action, (shortcut, desc) in self._DEFAULTS.items()
         }
 
     def get_shortcut(self, action_id: str) -> str | None:
@@ -118,8 +112,7 @@ class ShortcutManager:
     def reset_to_defaults(self) -> None:
         """Reset all shortcuts to their default values."""
         self._shortcuts = {
-            action: (shortcut, desc)
-            for action, (shortcut, desc) in self._defaults.items()
+            action: (shortcut, desc) for action, (shortcut, desc) in self._defaults.items()
         }
 
     def validate_shortcut(self, shortcut: str) -> bool:
@@ -186,15 +179,11 @@ class ShortcutManager:
 
         for action_id, shortcut in data.items():
             if not isinstance(action_id, str) or not isinstance(shortcut, str):
-                errors.append(
-                    f"Invalid entry for '{action_id}': expected string values."
-                )
+                errors.append(f"Invalid entry for '{action_id}': expected string values.")
                 continue
 
             if not self._validate_format(shortcut):
-                errors.append(
-                    f"Invalid shortcut format for '{action_id}': '{shortcut}'."
-                )
+                errors.append(f"Invalid shortcut format for '{action_id}': '{shortcut}'.")
                 continue
 
             conflicts = self.get_conflicts(shortcut, exclude_action=action_id)
@@ -249,13 +238,52 @@ class ShortcutManager:
         valid_single_keys = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
         valid_special_keys = frozenset(
             {
-                "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
-                "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17",
-                "F18", "F19", "F20", "F21", "F22", "F23", "F24",
-                "Space", "Tab", "Enter", "Return", "Escape", "Backspace",
-                "Delete", "Insert", "Home", "End", "PageUp", "PageDown",
-                "Up", "Down", "Left", "Right", "CapsLock", "NumLock",
-                "ScrollLock", "PrintScreen", "Pause", "Menu",
+                "F1",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "F10",
+                "F11",
+                "F12",
+                "F13",
+                "F14",
+                "F15",
+                "F16",
+                "F17",
+                "F18",
+                "F19",
+                "F20",
+                "F21",
+                "F22",
+                "F23",
+                "F24",
+                "Space",
+                "Tab",
+                "Enter",
+                "Return",
+                "Escape",
+                "Backspace",
+                "Delete",
+                "Insert",
+                "Home",
+                "End",
+                "PageUp",
+                "PageDown",
+                "Up",
+                "Down",
+                "Left",
+                "Right",
+                "CapsLock",
+                "NumLock",
+                "ScrollLock",
+                "PrintScreen",
+                "Pause",
+                "Menu",
             }
         )
 
@@ -274,9 +302,6 @@ class ShortcutManager:
             A normalized shortcut string.
         """
         parts = [p.strip() for p in shortcut.split("+")]
-        modifiers = sorted(
-            p for p in parts
-            if p in ShortcutManager._MODIFIER_PARTS
-        )
+        modifiers = sorted(p for p in parts if p in ShortcutManager._MODIFIER_PARTS)
         keys = [p for p in parts if p not in ShortcutManager._MODIFIER_PARTS]
         return "+".join(modifiers + keys)

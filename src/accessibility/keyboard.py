@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from PySide6.QtCore import QObject, QEvent
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QWidget
 
 
@@ -52,14 +52,10 @@ class FocusChain:
         Args:
             widget: The widget to remove.
         """
-        self._widgets = [
-            (order, w) for order, w in self._widgets if w is not widget
-        ]
+        self._widgets = [(order, w) for order, w in self._widgets if w is not widget]
 
         if self._widgets:
-            self._current_index = max(
-                0, min(self._current_index, len(self._widgets) - 1)
-            )
+            self._current_index = max(0, min(self._current_index, len(self._widgets) - 1))
         else:
             self._current_index = -1
 
@@ -144,9 +140,7 @@ class KeyboardNavigation(QObject):
         focus_chain: The FocusChain instance controlling tab order.
     """
 
-    _ARROW_DIRECTIONS: frozenset[str] = frozenset(
-        {"horizontal", "vertical", "both"}
-    )
+    _ARROW_DIRECTIONS: frozenset[str] = frozenset({"horizontal", "vertical", "both"})
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Initialize the keyboard navigation handler.
@@ -270,7 +264,7 @@ class KeyboardNavigation(QObject):
             return True
         return False
 
-    def _handle_arrow-navigation(self, direction: str, obj: Any) -> bool:
+    def _handle_arrow_navigation(self, direction: str, obj: Any) -> bool:
         """Handle arrow key navigation within a container widget.
 
         Args:

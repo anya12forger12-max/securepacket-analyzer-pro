@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +39,7 @@ class ServiceRegistry:
         self._health: dict[str, str] = {}
         self._registration_order: list[str] = []
 
-    def register(
-        self, name: str, service: Any, lazy: bool = False
-    ) -> None:
+    def register(self, name: str, service: Any, lazy: bool = False) -> None:
         """Register a service instance or factory.
 
         Args:
@@ -62,9 +61,7 @@ class ServiceRegistry:
             if name not in self._registration_order:
                 self._registration_order.append(name)
 
-    def register_factory(
-        self, name: str, factory: Callable[[], Any]
-    ) -> None:
+    def register_factory(self, name: str, factory: Callable[[], Any]) -> None:
         """Register a lazy factory callable.
 
         Args:
@@ -141,9 +138,7 @@ class ServiceRegistry:
                 del self._factories[name]
                 found = True
             self._health.pop(name, None)
-            self._registration_order = [
-                n for n in self._registration_order if n != name
-            ]
+            self._registration_order = [n for n in self._registration_order if n != name]
         if found:
             logger.debug("Removed service: %s", name)
         return found
@@ -155,10 +150,7 @@ class ServiceRegistry:
             Mapping of service name to health status string.
         """
         with self._lock:
-            return {
-                name: self._health.get(name, "unknown")
-                for name in self._registration_order
-            }
+            return {name: self._health.get(name, "unknown") for name in self._registration_order}
 
     def set_health(self, name: str, status: str) -> None:
         """Set the health status for a registered service.
@@ -173,9 +165,7 @@ class ServiceRegistry:
                 self._health[name] = status
                 logger.debug("Health for %s set to %s", name, status)
             else:
-                logger.warning(
-                    "Cannot set health for unknown service: %s", name
-                )
+                logger.warning("Cannot set health for unknown service: %s", name)
 
     def get_healthy(self) -> list[str]:
         """Return names of services with healthy status.
@@ -185,9 +175,7 @@ class ServiceRegistry:
         """
         with self._lock:
             return [
-                name
-                for name in self._registration_order
-                if self._health.get(name) == "healthy"
+                name for name in self._registration_order if self._health.get(name) == "healthy"
             ]
 
     def clear(self) -> None:
@@ -240,9 +228,7 @@ class ServiceRegistry:
                 except Exception:
                     logger.exception("Error shutting down service: %s", name)
             else:
-                logger.debug(
-                    "Service %s has no shutdown() method, skipping", name
-                )
+                logger.debug("Service %s has no shutdown() method, skipping", name)
 
     def _create_instance(self, factory: Callable[[], Any]) -> Any:
         """Invoke a factory callable with error handling and logging.

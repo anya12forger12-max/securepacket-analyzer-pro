@@ -11,7 +11,7 @@ import logging
 import logging.handlers
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,11 +23,11 @@ from src.utils.paths import AppPaths
 # ------------------------------------------------------------------
 
 _COLOR_CODES: dict[str, str] = {
-    logging.DEBUG: "\033[36m",      # cyan
-    logging.INFO: "\033[32m",       # green
-    logging.WARNING: "\033[33m",    # yellow
-    logging.ERROR: "\033[31m",      # red
-    logging.CRITICAL: "\033[1;31m", # bold red
+    logging.DEBUG: "\033[36m",  # cyan
+    logging.INFO: "\033[32m",  # green
+    logging.WARNING: "\033[33m",  # yellow
+    logging.ERROR: "\033[31m",  # red
+    logging.CRITICAL: "\033[1;31m",  # bold red
 }
 _RESET = "\033[0m"
 
@@ -45,6 +45,7 @@ class _ColouredFormatter(logging.Formatter):
 # ------------------------------------------------------------------
 # Specialised handlers
 # ------------------------------------------------------------------
+
 
 class _SecurityFileHandler(logging.Handler):
     """Appends security-related events to a dedicated log file."""
@@ -128,6 +129,7 @@ atexit.register(_shutdown_flusher.flush_all)
 # ------------------------------------------------------------------
 # AppLogger
 # ------------------------------------------------------------------
+
 
 class AppLogger:
     """Application-wide logging façade.
@@ -242,9 +244,7 @@ class AppLogger:
     # Specialised logging helpers
     # ------------------------------------------------------------------
 
-    def log_security(
-        self, event: str, details: dict[str, str] | None = None
-    ) -> None:
+    def log_security(self, event: str, details: dict[str, str] | None = None) -> None:
         """Record a security-related event.
 
         Parameters
@@ -317,7 +317,7 @@ class AppLogger:
         try:
             AppPaths.logs_dir().mkdir(parents=True, exist_ok=True)
             crash_path = AppPaths.logs_dir() / "crash.log"
-            timestamp = datetime.now(timezone.utc).isoformat()
+            timestamp = datetime.now(UTC).isoformat()
             with open(crash_path, "a", encoding="utf-8") as fh:
                 fh.write(f"\n{'='*60}\n")
                 fh.write(f"CRASH @ {timestamp}\n")

@@ -12,9 +12,9 @@ import json
 import logging
 import threading
 import tomllib
-from datetime import datetime, timezone
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from src.utils.paths import AppPaths
 
@@ -161,7 +161,10 @@ _VALIDATION_RULES: dict[str, tuple[type | tuple[type, ...], Callable[[Any], bool
     "accessibility.reduced_motion": (bool, None),
     "accessibility.large_ui": (bool, None),
     "accessibility.large_cursor": (bool, None),
-    "accessibility.color_blind_mode": (str, lambda v: v in ("none", "protanopia", "deuteranopia", "tritanopia")),
+    "accessibility.color_blind_mode": (
+        str,
+        lambda v: v in ("none", "protanopia", "deuteranopia", "tritanopia"),
+    ),
     "accessibility.text_scale": ((int, float), lambda v: 0.5 <= v <= 3.0),
     "accessibility.icon_scale": ((int, float), lambda v: 0.5 <= v <= 3.0),
     "accessibility.focus_indicators": (bool, None),
@@ -220,7 +223,10 @@ _VALIDATION_RULES: dict[str, tuple[type | tuple[type, ...], Callable[[Any], bool
     "backup.include_bookmarks": (bool, None),
     "backup.compression_level": ((int, float), lambda v: 0 <= v <= 9),
     "diagnostics.auto_run_on_startup": (bool, None),
-    "diagnostics.log_level": (str, lambda v: v in ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")),
+    "diagnostics.log_level": (
+        str,
+        lambda v: v in ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
+    ),
     "diagnostics.performance_monitoring": (bool, None),
     "diagnostics.performance_interval_seconds": ((int, float), lambda v: 0.1 <= v <= 60),
     "diagnostics.performance_history_size": ((int, float), lambda v: 60 <= v <= 3600),
@@ -431,9 +437,7 @@ class SettingsManager:
                 self._runtime_overrides.pop(section, None)
         self.save()
 
-    def register_callback(
-        self, key_path: str, callback: Callable[[str, Any, Any], None]
-    ) -> None:
+    def register_callback(self, key_path: str, callback: Callable[[str, Any, Any], None]) -> None:
         """Register a change notification callback.
 
         The callback is invoked as ``callback(key_path, old_value, new_value)``
@@ -487,9 +491,7 @@ class SettingsManager:
                 continue
 
             if not isinstance(value, expected):
-                errors.append(
-                    f"{key_path}: expected {expected}, got {type(value).__name__}"
-                )
+                errors.append(f"{key_path}: expected {expected}, got {type(value).__name__}")
                 continue
 
             if extra is not None and not extra(value):

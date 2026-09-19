@@ -25,9 +25,7 @@ logger = logging.getLogger(__name__)
 _SAFE_FILENAME_RE = re.compile(r"^[A-Za-z0-9_\-]+(\.[A-Za-z0-9_\-]+)*$")
 
 # Allowed hash algorithms
-_SUPPORTED_HASHES: frozenset[str] = frozenset(
-    hashlib.algorithms_available
-)
+_SUPPORTED_HASHES: frozenset[str] = frozenset(hashlib.algorithms_available)
 
 # URL validation
 _URL_PATTERN = re.compile(
@@ -158,9 +156,7 @@ class SecurityManager:
         fd: int | None = None
         tmp_path: Path | None = None
         try:
-            fd, tmp_name = tempfile.mkstemp(
-                dir=str(parent), prefix=".tmp_", suffix=".write"
-            )
+            fd, tmp_name = tempfile.mkstemp(dir=str(parent), prefix=".tmp_", suffix=".write")
             tmp_path = Path(tmp_name)
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fd = None  # fdopen owns it now
@@ -253,9 +249,7 @@ class SecurityManager:
     # Plugin verification (placeholder)
     # ------------------------------------------------------------------
 
-    def verify_plugin_signature(
-        self, plugin_path: Path, signature: str | None = None
-    ) -> bool:
+    def verify_plugin_signature(self, plugin_path: Path, signature: str | None = None) -> bool:
         """Verify a plugin's digital signature.
 
         This is a placeholder implementation that always returns
@@ -408,9 +402,7 @@ class SecurityManager:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _log_security_event(
-        self, event: str, details: dict[str, str] | None = None
-    ) -> None:
+    def _log_security_event(self, event: str, details: dict[str, str] | None = None) -> None:
         """Emit a structured security log entry."""
         parts = [event]
         if details:

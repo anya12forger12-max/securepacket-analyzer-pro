@@ -118,9 +118,7 @@ class PluginLoader:
     # Loading / unloading
     # ------------------------------------------------------------------
 
-    def load_plugin(
-        self, plugin_path: Path, metadata: PluginMetadata
-    ) -> PluginBase | None:
+    def load_plugin(self, plugin_path: Path, metadata: PluginMetadata) -> PluginBase | None:
         """Import, instantiate, and initialise a plugin.
 
         The ``entry_point`` field in ``plugin.json`` is used to locate
@@ -166,9 +164,7 @@ class PluginLoader:
 
         module_path = plugin_path / f"{entry_point}.py"
         if not module_path.is_file():
-            logger.error(
-                "Entry point module not found: %s", module_path
-            )
+            logger.error("Entry point module not found: %s", module_path)
             metadata.state = PluginState.ERROR
             metadata.load_error = f"Entry point module not found: {entry_point}.py"
             return None
@@ -190,9 +186,7 @@ class PluginLoader:
         try:
             plugin_instance.initialize(context)
         except Exception:
-            logger.exception(
-                "Plugin %s raised during initialize()", metadata.name
-            )
+            logger.exception("Plugin %s raised during initialize()", metadata.name)
             metadata.state = PluginState.ERROR
             metadata.load_error = "initialize() raised an exception"
             return None
@@ -221,9 +215,7 @@ class PluginLoader:
 
         if module is not None:
             prefix = f"src.plugins._external.{plugin_id}."
-            keys_to_remove = [
-                key for key in sys.modules if key.startswith(prefix)
-            ]
+            keys_to_remove = [key for key in sys.modules if key.startswith(prefix)]
             for key in keys_to_remove:
                 sys.modules.pop(key, None)
             logger.info("Unloaded plugin modules: %s", plugin_id)
@@ -281,14 +273,9 @@ class PluginLoader:
         list[str]
             Missing plugin identifiers.
         """
-        return [
-            dep for dep in metadata.dependencies
-            if dep not in loaded_plugins
-        ]
+        return [dep for dep in metadata.dependencies if dep not in loaded_plugins]
 
-    def check_version_compatibility(
-        self, metadata: PluginMetadata, app_version: str
-    ) -> bool:
+    def check_version_compatibility(self, metadata: PluginMetadata, app_version: str) -> bool:
         """Check whether the plugin supports the running application version.
 
         Parameters
@@ -369,9 +356,7 @@ class PluginLoader:
             return None
 
         if not self._security.verify_plugin_signature(dest_path):
-            logger.warning(
-                "Signature verification failed for %s — removing", metadata.name
-            )
+            logger.warning("Signature verification failed for %s — removing", metadata.name)
             try:
                 shutil.rmtree(dest_path)
             except OSError:
@@ -387,9 +372,7 @@ class PluginLoader:
         )
         return metadata
 
-    def uninstall_plugin(
-        self, plugin_id: str, plugin_dir: Path | None = None
-    ) -> bool:
+    def uninstall_plugin(self, plugin_id: str, plugin_dir: Path | None = None) -> bool:
         """Remove a plugin's directory from disk.
 
         Parameters
@@ -460,9 +443,7 @@ class PluginLoader:
             sys.modules.pop(module_name, None)
             return None
 
-    def _instantiate_plugin(
-        self, module: Any, metadata: PluginMetadata
-    ) -> PluginBase | None:
+    def _instantiate_plugin(self, module: Any, metadata: PluginMetadata) -> PluginBase | None:
         """Create a :class:`PluginBase` instance from a loaded module.
 
         Looks for a module-level ``create_plugin`` callable first, then
@@ -474,9 +455,7 @@ class PluginLoader:
                 instance = factory(metadata)
                 if isinstance(instance, PluginBase):
                     return instance
-                logger.error(
-                    "create_plugin() did not return a PluginBase instance"
-                )
+                logger.error("create_plugin() did not return a PluginBase instance")
                 return None
             except Exception:
                 logger.exception("create_plugin() raised")
@@ -500,9 +479,7 @@ class PluginLoader:
                     )
                     return None
 
-        logger.warning(
-            "No PluginBase subclass found in module %s", module.__name__
-        )
+        logger.warning("No PluginBase subclass found in module %s", module.__name__)
         return None
 
     def _build_context(self) -> dict[str, Any]:
@@ -529,7 +506,6 @@ class PluginLoader:
 
     def _compute_directory_checksum(self, directory: Path) -> str:
         """Compute a SHA-256 checksum of all Python files in *directory*."""
-        import hashlib
 
         combined = b""
         for py_file in sorted(directory.rglob("*.py")):

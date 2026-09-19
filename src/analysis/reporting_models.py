@@ -11,16 +11,15 @@ import json
 import threading
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from enum import Enum, auto
 from typing import Any
 
 from src.analysis.models import _now_iso
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class ReportSeverity(Enum):
     """Severity level assigned to generated reports."""
@@ -97,6 +96,7 @@ class ReportSection(Enum):
 # ReportTemplate
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ReportTemplate:
     """A reusable template that defines the structure of a generated report.
@@ -149,6 +149,7 @@ class ReportTemplate:
 # ---------------------------------------------------------------------------
 # Report
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Report:
@@ -221,6 +222,7 @@ class Report:
 # ---------------------------------------------------------------------------
 # Case
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Case:
@@ -376,6 +378,7 @@ class Case:
 # Evidence
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Evidence:
     """A discrete piece of evidence linked to one or more investigations.
@@ -506,6 +509,7 @@ class Evidence:
 # AnalystNote
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AnalystNote:
     """A markdown note authored by an analyst during an investigation.
@@ -574,6 +578,7 @@ class AnalystNote:
 # BookmarkFolder
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BookmarkFolder:
     """A folder for organising bookmarks with optional nesting via ``parent_id``."""
@@ -610,6 +615,7 @@ class BookmarkFolder:
 # ---------------------------------------------------------------------------
 # Bookmark
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Bookmark:
@@ -676,6 +682,7 @@ class Bookmark:
 # InvestigationEvent
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class InvestigationEvent:
     """A single chronological event on the investigation timeline.
@@ -728,6 +735,7 @@ class InvestigationEvent:
 # ---------------------------------------------------------------------------
 # ImportExportData
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ImportExportData:

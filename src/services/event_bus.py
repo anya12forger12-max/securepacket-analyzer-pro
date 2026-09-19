@@ -11,7 +11,8 @@ import logging
 import threading
 import time
 from collections import deque
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from PySide6.QtCore import QObject, Signal
 
@@ -213,9 +214,7 @@ class EventBus(QObject):
                 handlers.remove(handler)
                 logger.debug("Unsubscribed %s from %s", handler, event_name)
             except ValueError:
-                logger.debug(
-                    "Handler %s not found for event %s", handler, event_name
-                )
+                logger.debug("Handler %s not found for event %s", handler, event_name)
 
     def emit(self, event_name: str, data: Any = None) -> None:
         """Emit an event to all subscribers (both Python and Qt).
@@ -237,9 +236,7 @@ class EventBus(QObject):
             try:
                 handler(data)
             except Exception:
-                logger.exception(
-                    "Handler %s raised for event '%s'", handler, event_name
-                )
+                logger.exception("Handler %s raised for event '%s'", handler, event_name)
 
         self.event_emitted.emit(event_name, data)
 
@@ -256,6 +253,7 @@ class EventBus(QObject):
             event_name: The event channel name to filter on.
             slot: Qt-compatible callable (slot) to invoke.
         """
+
         def _filtered_slot(name: str, data: object) -> None:
             if name == event_name:
                 slot(data)
@@ -263,9 +261,7 @@ class EventBus(QObject):
         sender_id = id(self)
         signal_conn = self.event_emitted.connect(_filtered_slot)
         self._qt_connections.append((sender_id, signal_conn))
-        logger.debug(
-            "Connected Qt slot %s to event '%s'", slot, event_name
-        )
+        logger.debug("Connected Qt slot %s to event '%s'", slot, event_name)
 
     def disconnect_all(self) -> None:
         """Clear all Python subscriptions and Qt signal connections."""

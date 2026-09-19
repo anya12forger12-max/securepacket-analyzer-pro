@@ -306,9 +306,7 @@ class ReportTemplateManager:
         logger.info("Deleted custom template '%s' (%s)", tpl.name, template_id)
         return True
 
-    def duplicate_template(
-        self, template_id: str, new_name: str
-    ) -> ReportTemplate | None:
+    def duplicate_template(self, template_id: str, new_name: str) -> ReportTemplate | None:
         """Create a copy of *template_id* with *new_name*.
 
         Returns the new template or *None* if the source is not found.

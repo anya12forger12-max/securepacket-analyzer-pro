@@ -11,12 +11,8 @@ from typing import Any
 
 from src.analysis.models import _now_iso
 from src.analysis.reporting_models import (
-    Case,
-    ExportFormat,
     Report,
     ReportSection,
-    ReportSeverity,
-    ReportTemplate,
 )
 from src.reports.templates import ReportTemplateManager
 from src.services.event_bus import EventBus, Events
@@ -251,9 +247,7 @@ class ReportManager:
     # Report content generation
     # ------------------------------------------------------------------
 
-    def generate_report_content(
-        self, report_id: str, data: dict[str, Any]
-    ) -> dict[str, Any]:
+    def generate_report_content(self, report_id: str, data: dict[str, Any]) -> dict[str, Any]:
         """Populate report content from *data* according to the template.
 
         Each section enabled in the report's template is populated from

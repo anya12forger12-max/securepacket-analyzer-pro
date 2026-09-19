@@ -5,13 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-import tempfile
 import threading
 import time
-import zipfile
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -19,9 +17,7 @@ import pytest
 # Mock PySide6 before any project imports
 # ---------------------------------------------------------------------------
 _mock_qt = MagicMock()
-_mock_qt.QObject = type(
-    "QObject", (), {"__init__": lambda self, *a, **kw: None}
-)
+_mock_qt.QObject = type("QObject", (), {"__init__": lambda self, *a, **kw: None})
 _mock_qt.Signal = lambda *a, **kw: MagicMock()
 sys.modules["PySide6"] = MagicMock()
 sys.modules["PySide6.QtCore"] = _mock_qt
@@ -29,8 +25,14 @@ sys.modules["PySide6.QtCore"] = _mock_qt
 # ---------------------------------------------------------------------------
 # Project imports (safe after PySide6 mock)
 # ---------------------------------------------------------------------------
+from src.config.settings import _VALIDATION_RULES, DEFAULT_CONFIG
+from src.core.backup import BackupEntry, BackupManager, BackupType
+from src.core.updater import UpdateChannel, UpdateManager, UpdateStatus
+from src.diagnostics.performance import (
+    PerformanceMonitor,
+    PerformanceSnapshot,
+)
 from src.plugins.base import (
-    PluginBase,
     PluginCategory,
     PluginMetadata,
     PluginPermission,
@@ -38,20 +40,12 @@ from src.plugins.base import (
 )
 from src.plugins.loader import PluginLoader
 from src.plugins.manager import PluginManager
-from src.core.updater import UpdateChannel, UpdateManager, UpdateStatus
-from src.core.backup import BackupEntry, BackupManager, BackupType
-from src.diagnostics.performance import (
-    PerformanceLevel,
-    PerformanceMonitor,
-    PerformanceSnapshot,
-)
 from src.services.event_bus import EventBus, Events
-from src.config.settings import DEFAULT_CONFIG, SettingsManager, _VALIDATION_RULES
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _reset_event_bus():
@@ -80,8 +74,10 @@ def plugin_manager(tmp_path):
     sm.safe_file_read.return_value = None
     sm.safe_file_write.return_value = True
 
-    with patch("src.plugins.manager.EventBus") as eb_cls, \
-         patch("src.plugins.manager.AppPaths") as paths_cls:
+    with (
+        patch("src.plugins.manager.EventBus") as eb_cls,
+        patch("src.plugins.manager.AppPaths") as paths_cls,
+    ):
         paths_cls.data_dir.return_value = tmp_path
         eb_inst = MagicMock()
         eb_cls.instance.return_value = eb_inst
@@ -104,8 +100,10 @@ def update_manager(tmp_path):
     sm = MagicMock()
     sm.validate_url.return_value = True
 
-    with patch("src.core.updater.EventBus") as eb_cls, \
-         patch("src.core.updater.AppPaths") as paths_cls:
+    with (
+        patch("src.core.updater.EventBus") as eb_cls,
+        patch("src.core.updater.AppPaths") as paths_cls,
+    ):
         paths_cls.data_dir.return_value = tmp_path
         eb_inst = MagicMock()
         eb_cls.instance.return_value = eb_inst
@@ -125,8 +123,10 @@ def backup_manager(tmp_path):
         def set(self, key: str, value: Any) -> None:
             pass
 
-    with patch("src.core.backup.EventBus") as eb_cls, \
-         patch("src.core.backup.AppPaths") as paths_cls:
+    with (
+        patch("src.core.backup.EventBus") as eb_cls,
+        patch("src.core.backup.AppPaths") as paths_cls,
+    ):
         paths_cls.data_dir.return_value = tmp_path
         paths_cls.config_dir.return_value = tmp_path / "config"
         paths_cls.workspaces_dir.return_value = tmp_path / "workspaces"
@@ -140,6 +140,7 @@ def backup_manager(tmp_path):
 # ===================================================================
 # TestPluginMetadata
 # ===================================================================
+
 
 class TestPluginMetadata:
     """Tests for the PluginMetadata dataclass."""
@@ -279,6 +280,7 @@ class TestPluginMetadata:
 # TestPluginState
 # ===================================================================
 
+
 class TestPluginState:
     """Verify PluginState enum has all expected values."""
 
@@ -296,6 +298,7 @@ class TestPluginState:
 # ===================================================================
 # TestPluginCategory
 # ===================================================================
+
 
 class TestPluginCategory:
     """Verify PluginCategory enum has all expected values."""
@@ -323,6 +326,7 @@ class TestPluginCategory:
 # TestPluginPermission
 # ===================================================================
 
+
 class TestPluginPermission:
     """Verify PluginPermission enum has all expected values."""
 
@@ -348,6 +352,7 @@ class TestPluginPermission:
 # TestPluginLoader
 # ===================================================================
 
+
 class TestPluginLoader:
     """Tests for PluginLoader discovery, validation, and lifecycle."""
 
@@ -360,9 +365,7 @@ class TestPluginLoader:
 
     def test_validate_plugin_valid(self, loader):
         """Valid metadata returns no errors."""
-        meta = PluginMetadata(
-            id="valid1", name="Valid", version="1.0.0", api_version="1.0"
-        )
+        meta = PluginMetadata(id="valid1", name="Valid", version="1.0.0", api_version="1.0")
         errors = loader.validate_plugin(meta)
         assert errors == []
 
@@ -380,9 +383,7 @@ class TestPluginLoader:
 
     def test_validate_plugin_bad_version(self, loader):
         """Non-empty but unconventional version string still passes basic validation."""
-        meta = PluginMetadata(
-            id="x", name="Test", version="not-semver", api_version="1.0"
-        )
+        meta = PluginMetadata(id="x", name="Test", version="not-semver", api_version="1.0")
         errors = loader.validate_plugin(meta)
         assert errors == []
 
@@ -464,6 +465,7 @@ class TestPluginLoader:
 # TestPluginManager
 # ===================================================================
 
+
 class TestPluginManager:
     """Tests for PluginManager high-level lifecycle operations."""
 
@@ -483,11 +485,10 @@ class TestPluginManager:
         fake_dir.mkdir(parents=True)
 
         mock_plugin = MagicMock()
-        with patch.object(
-            plugin_manager._loader, "get_plugin_directory"
-        ) as gpd, patch.object(
-            plugin_manager._loader, "load_plugin"
-        ) as lp:
+        with (
+            patch.object(plugin_manager._loader, "get_plugin_directory") as gpd,
+            patch.object(plugin_manager._loader, "load_plugin") as lp,
+        ):
             gpd.return_value = tmp_path / "pm_plugins"
             lp.return_value = mock_plugin
             result = plugin_manager.enable("ep1")
@@ -540,6 +541,7 @@ class TestPluginManager:
 # ===================================================================
 # TestUpdateManager
 # ===================================================================
+
 
 class TestUpdateManager:
     """Tests for UpdateManager version, channel, history, and validation."""
@@ -594,6 +596,7 @@ class TestUpdateManager:
 # ===================================================================
 # TestBackupManager
 # ===================================================================
+
 
 class TestBackupManager:
     """Tests for BackupManager creation, verification, and deletion."""
@@ -686,6 +689,7 @@ class TestBackupManager:
 # TestPerformanceMonitor
 # ===================================================================
 
+
 class TestPerformanceMonitor:
     """Tests for PerformanceMonitor snapshots, thresholds, and ring buffer."""
 
@@ -752,7 +756,7 @@ class TestPerformanceMonitor:
             with monitor._lock:
                 monitor._snapshots.append(snap)
                 if len(monitor._snapshots) > monitor._max_snapshots:
-                    monitor._snapshots = monitor._snapshots[-monitor._max_snapshots:]
+                    monitor._snapshots = monitor._snapshots[-monitor._max_snapshots :]
 
         assert len(monitor._snapshots) == 10
         # The oldest entries should be trimmed; latest should be timestamp=24
@@ -763,6 +767,7 @@ class TestPerformanceMonitor:
 # ===================================================================
 # TestSettingsValidation
 # ===================================================================
+
 
 class TestSettingsValidation:
     """Tests for DEFAULT_CONFIG structure and _VALIDATION_RULES coverage."""
@@ -810,6 +815,7 @@ class TestSettingsValidation:
 # ===================================================================
 # TestEventsExtended
 # ===================================================================
+
 
 class TestEventsExtended:
     """Tests that all expected event constants exist on the Events class."""
@@ -865,6 +871,7 @@ class TestEventsExtended:
 # TestThreadSafety
 # ===================================================================
 
+
 class TestThreadSafety:
     """Verify thread-safety of core data structures."""
 
@@ -888,9 +895,7 @@ class TestThreadSafety:
                 with lock:
                     errors.append(exc)
 
-        threads = [
-            threading.Thread(target=create_meta, args=(i,)) for i in range(50)
-        ]
+        threads = [threading.Thread(target=create_meta, args=(i,)) for i in range(50)]
         for t in threads:
             t.start()
         for t in threads:

@@ -8,8 +8,8 @@ import logging
 import shutil
 import threading
 import urllib.request
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class UpdateChannel(Enum):
     """Release channel for update checks."""
@@ -52,6 +53,7 @@ class UpdateStatus(Enum):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ReleaseInfo:
@@ -135,6 +137,7 @@ class UpdateHistory:
 # ---------------------------------------------------------------------------
 # Update manager
 # ---------------------------------------------------------------------------
+
 
 class UpdateManager:
     """Orchestrates the full update lifecycle: check, download, verify,
@@ -225,9 +228,7 @@ class UpdateManager:
     # Check for updates
     # ------------------------------------------------------------------
 
-    def check_for_updates(
-        self, server_url: str = ""
-    ) -> ReleaseInfo | None:
+    def check_for_updates(self, server_url: str = "") -> ReleaseInfo | None:
         """Query the update server for a newer release.
 
         Parameters
@@ -409,7 +410,7 @@ class UpdateManager:
         Path or None
             The backup root path, or *None* on failure.
         """
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         backup_path = self._backup_dir / f"backup_{timestamp}"
         backup_path.mkdir(parents=True, exist_ok=True)
 
@@ -642,6 +643,7 @@ class UpdateManager:
 
     def _is_newer(self, remote_version: str) -> bool:
         """Return *True* when *remote_version* is newer than the local one."""
+
         def _parse(v: str) -> tuple[int, ...]:
             parts = v.strip().split(".")
             result: list[int] = []

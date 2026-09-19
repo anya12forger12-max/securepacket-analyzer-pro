@@ -48,9 +48,7 @@ class ThemeManager(QObject):
         },
     }
 
-    def __init__(
-        self, settings: Any = None, accessibility: Any = None
-    ) -> None:
+    def __init__(self, settings: Any = None, accessibility: Any = None) -> None:
         """Initialize the theme manager.
 
         Args:
@@ -128,8 +126,7 @@ class ThemeManager(QObject):
         """
         if name not in self._themes:
             raise ValueError(
-                f"Unknown theme '{name}'. "
-                f"Available themes: {sorted(self._themes.keys())}"
+                f"Unknown theme '{name}'. " f"Available themes: {sorted(self._themes.keys())}"
             )
         self._current_theme = name
         self._set_setting("theme/current", name)

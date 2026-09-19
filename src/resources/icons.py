@@ -8,10 +8,9 @@ all standard application icon names.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
-from PySide6.QtCore import Qt, QRectF, QSize
-from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QFont
+from PySide6.QtCore import QRectF, QSize, Qt
+from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
 
 
 class IconManager:
@@ -30,12 +29,12 @@ class IconManager:
 
     _STANDARD_ICONS: dict[str, str] = {
         "home": "\u2302",
-        "dashboard": "\u25A3",
-        "capture": "\u25CF",
-        "packet": "\u25A4",
+        "dashboard": "\u25a3",
+        "capture": "\u25cf",
+        "packet": "\u25a4",
         "hosts": "\u2514",
-        "connections": "\u250C",
-        "alerts": "\u26A0",
+        "connections": "\u250c",
+        "alerts": "\u26a0",
         "statistics": "\u2588",
         "reports": "\u2193",
         "settings": "\u2699",
@@ -45,35 +44,35 @@ class IconManager:
         "menu": "\u2630",
         "close": "\u2715",
         "minimize": "\u2500",
-        "maximize": "\u25A1",
+        "maximize": "\u25a1",
         "restore": "\u2195",
         "add": "+",
         "remove": "\u2212",
-        "edit": "\u270E",
+        "edit": "\u270e",
         "delete": "\u2718",
-        "refresh": "\u21BB",
-        "filter": "\u25B3",
+        "refresh": "\u21bb",
+        "filter": "\u25b3",
         "export": "\u2191",
         "import": "\u2193",
         "save": "\u2913",
-        "open": "\u25BD",
+        "open": "\u25bd",
         "new": "\u2795",
-        "start": "\u25B6",
-        "stop": "\u25A0",
-        "pause": "\u23F8",
-        "play": "\u25B6",
-        "warning": "\u26A0",
+        "start": "\u25b6",
+        "stop": "\u25a0",
+        "pause": "\u23f8",
+        "play": "\u25b6",
+        "warning": "\u26a0",
         "error": "\u2718",
         "info": "\u2139",
         "success": "\u2714",
-        "security": "\u26E8",
+        "security": "\u26e8",
         "workspace": "\u2302",
-        "notifications": "\u266B",
+        "notifications": "\u266b",
         "about": "\u2139",
         "exit": "\u2190",
-        "fullscreen": "\u26F6",
-        "collapse": "\u229E",
-        "expand": "\u229F",
+        "fullscreen": "\u26f6",
+        "collapse": "\u229e",
+        "expand": "\u229f",
         "up": "\u2191",
         "down": "\u2193",
         "left": "\u2190",

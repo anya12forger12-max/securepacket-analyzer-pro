@@ -10,10 +10,9 @@ from __future__ import annotations
 import copy
 import json
 import logging
-import shutil
 import uuid
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +44,7 @@ class Workspace:
     modified_at: str = ""
 
     def __post_init__(self) -> None:
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         if not self.created_at:
             self.created_at = now
         if not self.modified_at:
@@ -193,7 +192,7 @@ class WorkspaceManager:
             return False
 
         ws.name = new_name
-        ws.modified_at = datetime.now(timezone.utc).isoformat()
+        ws.modified_at = datetime.now(UTC).isoformat()
         self.save_workspace(ws)
         old_path.unlink()
         logger.info("Renamed workspace '%s' -> '%s'", old_name, new_name)
@@ -276,7 +275,7 @@ class WorkspaceManager:
 
     def save_workspace(self, workspace: Workspace) -> None:
         """Persist a workspace to its JSON file."""
-        workspace.modified_at = datetime.now(timezone.utc).isoformat()
+        workspace.modified_at = datetime.now(UTC).isoformat()
         ws_path = self._workspace_path(workspace.name)
         ws_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -334,9 +333,7 @@ class WorkspaceManager:
             logger.error("Export failed for workspace '%s': %s", name, exc)
             return False
 
-    def import_workspace(
-        self, path: Path, name: str | None = None
-    ) -> Workspace | None:
+    def import_workspace(self, path: Path, name: str | None = None) -> Workspace | None:
         """Import a workspace from an external JSON file.
 
         Parameters

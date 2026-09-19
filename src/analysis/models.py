@@ -9,16 +9,15 @@ hints.
 from __future__ import annotations
 
 import threading
-import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum, auto
 from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class PacketDirection(Enum):
     """Logical direction of a packet relative to the capture point."""
@@ -79,19 +78,21 @@ class ProtocolCategory(Enum):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _float_to_iso(ts: float) -> str:
     """Convert an epoch float to an ISO-8601 string."""
-    return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+    return datetime.fromtimestamp(ts, tz=UTC).isoformat()
 
 
 # ---------------------------------------------------------------------------
 # PacketInfo
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PacketInfo:
@@ -216,6 +217,7 @@ class PacketInfo:
 # HostInfo
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class HostInfo:
     """Aggregated statistics for a single network host.
@@ -257,9 +259,7 @@ class HostInfo:
             *True* when the packet originated from this host.
         """
         with self._lock:
-            now_iso = datetime.fromtimestamp(
-                packet.timestamp, tz=timezone.utc
-            ).isoformat()
+            now_iso = datetime.fromtimestamp(packet.timestamp, tz=UTC).isoformat()
 
             if not self.first_seen:
                 self.first_seen = now_iso
@@ -294,7 +294,7 @@ class HostInfo:
             return False
         try:
             last = datetime.fromisoformat(self.last_seen)
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             delta = (now - last).total_seconds()
             return delta <= recent_seconds
         except ValueError:
@@ -361,6 +361,7 @@ class HostInfo:
 # ConnectionInfo
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ConnectionInfo:
     """Represents a single unidirectional or bidirectional connection.
@@ -394,9 +395,7 @@ class ConnectionInfo:
     def update_from_packet(self, packet: PacketInfo) -> None:
         """Thread-safe update from a single packet."""
         with self._lock:
-            now_iso = datetime.fromtimestamp(
-                packet.timestamp, tz=timezone.utc
-            ).isoformat()
+            now_iso = datetime.fromtimestamp(packet.timestamp, tz=UTC).isoformat()
 
             if not self.start_time:
                 self.start_time = now_iso
@@ -434,7 +433,7 @@ class ConnectionInfo:
             return False
         try:
             last = datetime.fromisoformat(self.last_activity)
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             return (now - last).total_seconds() <= timeout
         except ValueError:
             return False
@@ -502,6 +501,7 @@ class ConnectionInfo:
 # ProtocolStats
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ProtocolStats:
     """Per-protocol aggregated statistics.
@@ -536,9 +536,7 @@ class ProtocolStats:
             The wire-length of the packet in bytes.
         """
         with self._lock:
-            now_iso = datetime.fromtimestamp(
-                packet.timestamp, tz=timezone.utc
-            ).isoformat()
+            now_iso = datetime.fromtimestamp(packet.timestamp, tz=UTC).isoformat()
 
             if not self.first_seen:
                 self.first_seen = now_iso
@@ -566,15 +564,14 @@ class ProtocolStats:
             "malformed_count": self.malformed_count,
             "first_seen": self.first_seen,
             "last_seen": self.last_seen,
-            "sub_protocols": {
-                name: sub.to_dict() for name, sub in self.sub_protocols.items()
-            },
+            "sub_protocols": {name: sub.to_dict() for name, sub in self.sub_protocols.items()},
         }
 
 
 # ---------------------------------------------------------------------------
 # BandwidthSample
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BandwidthSample:
@@ -604,6 +601,7 @@ class BandwidthSample:
 # TimelineEvent
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TimelineEvent:
     """A single event on the analysis timeline.
@@ -622,6 +620,7 @@ class TimelineEvent:
 # ---------------------------------------------------------------------------
 # ConversationInfo
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ConversationInfo:
@@ -649,9 +648,7 @@ class ConversationInfo:
     def update_from_packet(self, packet: PacketInfo) -> None:
         """Thread-safe, direction-aware update from a single packet."""
         with self._lock:
-            now_iso = datetime.fromtimestamp(
-                packet.timestamp, tz=timezone.utc
-            ).isoformat()
+            now_iso = datetime.fromtimestamp(packet.timestamp, tz=UTC).isoformat()
 
             if not self.start_time:
                 self.start_time = now_iso
@@ -710,6 +707,7 @@ class ConversationInfo:
 # SessionInfo
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class SessionInfo:
     """Represents a higher-level session over one or more connections.
@@ -738,7 +736,7 @@ class SessionInfo:
             if self.end_time:
                 ref = datetime.fromisoformat(self.end_time)
             else:
-                ref = datetime.now(timezone.utc)
+                ref = datetime.now(UTC)
             start = datetime.fromisoformat(self.start_time)
             elapsed = (ref - start).total_seconds()
             if self.packets == 0 and elapsed > self.timeout:
@@ -771,6 +769,7 @@ class SessionInfo:
 # ---------------------------------------------------------------------------
 # TrafficSnapshot
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TrafficSnapshot:
