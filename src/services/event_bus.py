@@ -7,14 +7,17 @@ and UI components. Thread-safe for background thread emission.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import threading
 import time
 from collections import deque
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QObject, Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -270,10 +273,8 @@ class EventBus(QObject):
             self._event_history.clear()
 
         for _, conn in self._qt_connections:
-            try:
+            with contextlib.suppress(RuntimeError, TypeError):
                 self.event_emitted.disconnect(conn)
-            except (RuntimeError, TypeError):
-                pass
         self._qt_connections.clear()
         logger.debug("All event bus subscriptions cleared")
 

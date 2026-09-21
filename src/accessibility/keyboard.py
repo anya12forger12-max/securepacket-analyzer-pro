@@ -6,11 +6,13 @@ navigation throughout the application interface.
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QWidget
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class FocusChain:
@@ -37,7 +39,7 @@ class FocusChain:
             widget: The focusable widget to register.
             order: Numeric order determining focus position.
         """
-        for i, (existing_order, existing_widget) in enumerate(self._widgets):
+        for i, (_existing_order, existing_widget) in enumerate(self._widgets):
             if existing_widget is widget:
                 self._widgets[i] = (order, widget)
                 self._widgets.sort(key=lambda item: item[0])
@@ -161,7 +163,7 @@ class KeyboardNavigation(QObject):
         """
         widget.installEventFilter(self)
 
-    def event_filter(self, obj: Any, event: QEvent) -> bool:
+    def event_filter(self, _obj: Any, event: QEvent) -> bool:
         """Filter keyboard events for navigation handling.
 
         Processes Tab, Shift+Tab, arrow keys, Escape, and registered
@@ -227,7 +229,7 @@ class KeyboardNavigation(QObject):
                 if action_id is not None:
                     return self._execute_action(action_id)
 
-        except Exception:
+        except Exception:  # noqa: S110 -- best-effort input handling
             pass
 
         return False
@@ -241,10 +243,7 @@ class KeyboardNavigation(QObject):
         Returns:
             True if focus was moved.
         """
-        if backwards:
-            widget = self.focus_chain.previous()
-        else:
-            widget = self.focus_chain.next()
+        widget = self.focus_chain.previous() if backwards else self.focus_chain.next()
 
         if widget is not None:
             widget.setFocus()
@@ -289,7 +288,7 @@ class KeyboardNavigation(QObject):
 
         return False
 
-    def _resolve_shortcut_event(self, event: QEvent) -> str | None:
+    def _resolve_shortcut_event(self, _event: QEvent) -> str | None:
         """Resolve a key press event to a registered action ID.
 
         Args:
@@ -333,8 +332,7 @@ class KeyboardNavigation(QObject):
         """
         if direction not in self._ARROW_DIRECTIONS:
             raise ValueError(
-                f"Invalid direction '{direction}'. "
-                f"Must be one of: {sorted(self._ARROW_DIRECTIONS)}"
+                f"Invalid direction '{direction}'. Must be one of: {sorted(self._ARROW_DIRECTIONS)}"
             )
         self._arrow_navigation[id(widget)] = direction
 

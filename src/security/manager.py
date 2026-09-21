@@ -6,6 +6,7 @@ permission checks used throughout the application.
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import logging
 import os
@@ -169,10 +170,8 @@ class SecurityManager:
         except OSError as exc:
             logger.error("Atomic write failed for %s: %s", path, exc)
             if fd is not None:
-                try:
+                with contextlib.suppress(OSError):
                     os.close(fd)
-                except OSError:
-                    pass
             if tmp_path is not None and tmp_path.exists():
                 tmp_path.unlink(missing_ok=True)
 
@@ -211,10 +210,7 @@ class SecurityManager:
             return False
         if "\x00" in value:
             return False
-        if pattern is not None:
-            if not re.fullmatch(pattern, value):
-                return False
-        return True
+        return not (pattern is not None and not re.fullmatch(pattern, value))
 
     # ------------------------------------------------------------------
     # Hashing
@@ -380,7 +376,7 @@ class SecurityManager:
 
         # Reject common SSRF targets
         hostname = parsed.hostname.lower()
-        blocked = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}
+        blocked = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}  # noqa: S104 -- SSRF blocklist strings, not a bind
         if hostname in blocked:
             self._log_security_event(
                 "SSRF_BLOCKED",

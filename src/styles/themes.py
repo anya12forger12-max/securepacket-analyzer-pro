@@ -7,10 +7,13 @@ for dynamic theme adaptation.
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
+import contextlib
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from PySide6.QtCore import QObject, Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class ThemeManager(QObject):
@@ -27,7 +30,7 @@ class ThemeManager(QObject):
 
     theme_changed = Signal(str)
 
-    _THEME_INFO: dict[str, dict[str, str]] = {
+    _THEME_INFO: ClassVar[dict[str, dict[str, str]]] = {
         "dark": {
             "name": "Dark",
             "description": "A dark theme optimized for low-light environments.",
@@ -94,10 +97,8 @@ class ThemeManager(QObject):
             value: The value to store.
         """
         if self._settings is not None and hasattr(self._settings, "set"):
-            try:
+            with contextlib.suppress(Exception):
                 self._settings.set(key, value)
-            except Exception:
-                pass
 
     def get_available_themes(self) -> list[str]:
         """Return a list of all registered theme names.
@@ -126,7 +127,7 @@ class ThemeManager(QObject):
         """
         if name not in self._themes:
             raise ValueError(
-                f"Unknown theme '{name}'. " f"Available themes: {sorted(self._themes.keys())}"
+                f"Unknown theme '{name}'. Available themes: {sorted(self._themes.keys())}"
             )
         self._current_theme = name
         self._set_setting("theme/current", name)

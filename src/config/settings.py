@@ -12,11 +12,13 @@ import json
 import logging
 import threading
 import tomllib
-from collections.abc import Callable
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -272,7 +274,7 @@ class SettingsManager:
             return
 
         try:
-            with open(toml_path, "rb") as fh:
+            with toml_path.open("rb") as fh:
                 loaded = tomllib.load(fh)
             self._defaults = self._deep_merge(copy.deepcopy(DEFAULT_CONFIG), loaded)
         except (tomllib.TOMLDecodeError, OSError) as exc:
@@ -297,7 +299,7 @@ class SettingsManager:
     def _toml_line(key: str, value: Any) -> str:
         """Format a single TOML key-value line."""
         if isinstance(value, bool):
-            return f'{key} = {"true" if value else "false"}'
+            return f"{key} = {'true' if value else 'false'}"
         if isinstance(value, str):
             return f'{key} = "{value}"'
         if isinstance(value, (int, float)):
@@ -330,7 +332,7 @@ class SettingsManager:
                 base[key] = value
         return base
 
-    def _resolve(self, key_path: str) -> dict[str, Any]:
+    def _resolve(self, _key_path: str) -> dict[str, Any]:
         """Build a merged config dict from defaults + user + runtime."""
         with self._lock:
             merged = copy.deepcopy(self._defaults)

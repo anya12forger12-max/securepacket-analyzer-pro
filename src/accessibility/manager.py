@@ -7,7 +7,8 @@ accessible color palettes.
 
 from __future__ import annotations
 
-from typing import Any
+import contextlib
+from typing import Any, ClassVar
 
 from PySide6.QtCore import QObject, Signal
 
@@ -36,7 +37,7 @@ class AccessibilityManager(QObject):
     _ICON_SCALE_MAX: float = 3.0
     _MIN_TOUCH_TARGET: int = 44
 
-    _PALETTES: dict[str, dict[str, str]] = {
+    _PALETTES: ClassVar[dict[str, dict[str, str]]] = {
         "normal": {
             "primary": "#0078D4",
             "secondary": "#5C2D91",
@@ -153,10 +154,8 @@ class AccessibilityManager(QObject):
             value: The value to store.
         """
         if self._settings is not None and hasattr(self._settings, "set"):
-            try:
+            with contextlib.suppress(Exception):
                 self._settings.set(key, value)
-            except Exception:
-                pass
 
     @property
     def high_contrast(self) -> bool:
@@ -442,12 +441,11 @@ class AccessibilityManager(QObject):
                     "AAA-level readability (WCAG 1.4.8)."
                 )
 
-        if level in ("A", "AA", "AAA"):
-            if not self.accessible_tooltips:
-                issues.append(
-                    "Accessible tooltips are disabled. Tooltips provide "
-                    "additional context for users (WCAG 1.3.1)."
-                )
+        if level in ("A", "AA", "AAA") and not self.accessible_tooltips:
+            issues.append(
+                "Accessible tooltips are disabled. Tooltips provide "
+                "additional context for users (WCAG 1.3.1)."
+            )
 
         return issues
 

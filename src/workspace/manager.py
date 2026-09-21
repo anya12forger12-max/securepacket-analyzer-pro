@@ -13,11 +13,13 @@ import logging
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.config.settings import SettingsManager
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

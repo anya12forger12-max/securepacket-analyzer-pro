@@ -6,12 +6,15 @@ for the application interface.
 
 from __future__ import annotations
 
+import contextlib
 import platform
 import sys
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from PySide6.QtGui import QFont, QFontDatabase
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FontManager:
@@ -38,7 +41,7 @@ class FontManager:
         "EasyReading",
     )
 
-    _SYSTEM_FONT_MAPS: dict[str, dict[str, str]] = {
+    _SYSTEM_FONT_MAPS: ClassVar[dict[str, dict[str, str]]] = {
         "Linux": {
             "sans": "Ubuntu",
             "serif": "Liberation Serif",
@@ -95,10 +98,8 @@ class FontManager:
             value: The value to store.
         """
         if self._settings is not None and hasattr(self._settings, "set"):
-            try:
+            with contextlib.suppress(Exception):
                 self._settings.set(key, value)
-            except Exception:
-                pass
 
     def get_default_font(self) -> QFont:
         """Return the application default font with user preferences applied.
@@ -161,7 +162,7 @@ class FontManager:
         clamped = max(self._MIN_SIZE, min(self._MAX_SIZE, size))
         if clamped != size:
             raise ValueError(
-                f"Font size must be between {self._MIN_SIZE} and " f"{self._MAX_SIZE}, got {size}"
+                f"Font size must be between {self._MIN_SIZE} and {self._MAX_SIZE}, got {size}"
             )
         self._set_setting("font/size", clamped)
 

@@ -16,13 +16,11 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import os
 import platform
 import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 # Project root is one level up from scripts/
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -46,12 +44,12 @@ def detect_platform() -> str:
 
 def run_command(cmd: list[str], description: str, cwd: Path | None = None) -> bool:
     """Run a shell command with logging."""
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"  {description}")
     print(f"  Command: {' '.join(cmd)}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603 -- trusted build commands
             cmd,
             cwd=cwd or PROJECT_ROOT,
             check=True,
@@ -99,13 +97,18 @@ def build_executable(platform_name: str) -> bool:
 
     return run_command(
         [
-            sys.executable, "-m", "PyInstaller",
+            sys.executable,
+            "-m",
+            "PyInstaller",
             "--onefile",
-            "--name", APP_NAME,
+            "--name",
+            APP_NAME,
             "--clean",
             "--noconfirm",
-            "--distpath", str(DIST_DIR / platform_name),
-            "--workpath", str(BUILD_DIR / platform_name),
+            "--distpath",
+            str(DIST_DIR / platform_name),
+            "--workpath",
+            str(BUILD_DIR / platform_name),
             *icon_arg,
             ENTRY_MODULE,
         ],
@@ -145,8 +148,9 @@ def generate_checksums() -> bool:
     for path in sorted(DIST_DIR.rglob("*")):
         if path.is_file() and path.name != "checksums.txt":
             import hashlib
+
             h = hashlib.sha256()
-            with open(path, "rb") as f:
+            with Path(path).open("rb") as f:
                 for chunk in iter(lambda: f.read(8192), b""):
                     h.update(chunk)
             rel = path.relative_to(DIST_DIR)
@@ -200,13 +204,13 @@ def main() -> int:
     success &= generate_checksums()
 
     if success:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("  Build complete! Artifacts in dist/")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
     else:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("  Build completed with errors")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
     return 0 if success else 1
 

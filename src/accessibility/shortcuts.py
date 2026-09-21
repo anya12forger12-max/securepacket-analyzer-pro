@@ -6,6 +6,8 @@ definition, validation, conflict detection, and import/export.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 
 class ShortcutManager:
     """Manages keyboard shortcuts for the application.
@@ -19,7 +21,7 @@ class ShortcutManager:
         _defaults: Immutable copy of the original default shortcuts.
     """
 
-    _DEFAULTS: dict[str, tuple[str, str]] = {
+    _DEFAULTS: ClassVar[dict[str, tuple[str, str]]] = {
         "file.new": ("Ctrl+N", "New Capture"),
         "file.open": ("Ctrl+O", "Open File"),
         "file.save": ("Ctrl+S", "Save"),

@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.plugins.base import (
     PluginBase,
@@ -17,6 +16,9 @@ from src.plugins.loader import PluginLoader
 from src.security.manager import SecurityManager
 from src.services.event_bus import EventBus, Events
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

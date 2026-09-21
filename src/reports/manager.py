@@ -6,8 +6,7 @@ import json
 import logging
 import threading
 import uuid
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.analysis.models import _now_iso
 from src.analysis.reporting_models import (
@@ -17,6 +16,9 @@ from src.analysis.reporting_models import (
 from src.reports.templates import ReportTemplateManager
 from src.services.event_bus import EventBus, Events
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

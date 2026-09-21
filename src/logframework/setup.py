@@ -7,16 +7,21 @@ dedicated log streams for security events and performance data.
 from __future__ import annotations
 
 import atexit
+import contextlib
 import logging
 import logging.handlers
 import sys
 import traceback
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.config.settings import SettingsManager
 from src.utils.paths import AppPaths
+
+logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ------------------------------------------------------------------
 # Colour helpers (ANSI escapes – silently ignored by non-TTY sinks)
@@ -116,10 +121,8 @@ class _ShutdownFlusher:
 
     def flush_all(self) -> None:
         for handler in self._handlers:
-            try:
+            with contextlib.suppress(Exception):
                 handler.flush()
-            except Exception:
-                pass
 
 
 _shutdown_flusher = _ShutdownFlusher()
@@ -318,10 +321,10 @@ class AppLogger:
             AppPaths.logs_dir().mkdir(parents=True, exist_ok=True)
             crash_path = AppPaths.logs_dir() / "crash.log"
             timestamp = datetime.now(UTC).isoformat()
-            with open(crash_path, "a", encoding="utf-8") as fh:
-                fh.write(f"\n{'='*60}\n")
+            with crash_path.open("a", encoding="utf-8") as fh:
+                fh.write(f"\n{'=' * 60}\n")
                 fh.write(f"CRASH @ {timestamp}\n")
-                fh.write(f"{'='*60}\n")
+                fh.write(f"{'=' * 60}\n")
                 fh.write(f"{exc_type.__name__}: {exc_value}\n")
                 fh.write(tb_text)
                 fh.write("\n")
@@ -338,10 +341,8 @@ class AppLogger:
     def flush(self) -> None:
         """Flush all active handlers immediately."""
         for handler in self._handlers:
-            try:
+            with contextlib.suppress(Exception):
                 handler.flush()
-            except Exception:
-                pass
         if self._security_handler is not None:
             self._security_handler.flush()
         if self._performance_handler is not None:

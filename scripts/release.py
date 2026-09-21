@@ -15,7 +15,7 @@ import argparse
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -57,19 +57,19 @@ def set_version(version: str) -> None:
 
 def generate_changelog_entry(version: str) -> str:
     """Generate a changelog entry for the new version."""
-    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    return f"\n## [{version}] - {date}\n\n### Added\n\n- \n\n### Changed\n\n- \n\n### Fixed\n\n- \n\n"
+    date = datetime.now(UTC).strftime("%Y-%m-%d")
+    return (
+        f"\n## [{version}] - {date}\n\n### Added\n\n- \n\n### Changed\n\n- \n\n### Fixed\n\n- \n\n"
+    )
 
 
 def prepare_release() -> None:
     """Prepare a release: validate, generate changelog entry."""
     version = get_current_version()
     print(f"Preparing release: v{version}")
-
     # Check for uncommitted changes
     result = subprocess.run(
-        ["git", "status", "--porcelain"],
-        capture_output=True, text=True, cwd=PROJECT_ROOT
+        ["git", "status", "--porcelain"], capture_output=True, text=True, cwd=PROJECT_ROOT
     )
     if result.stdout.strip():
         print("WARNING: Uncommitted changes detected:")
@@ -77,10 +77,7 @@ def prepare_release() -> None:
 
     # Run tests
     print("\nRunning tests...")
-    subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short"],
-        cwd=PROJECT_ROOT
-    )
+    subprocess.run([sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short"], cwd=PROJECT_ROOT)
 
     # Generate changelog entry
     entry = generate_changelog_entry(version)
@@ -91,9 +88,7 @@ def prepare_release() -> None:
 def create_git_tag(version: str) -> None:
     """Create and push a git tag."""
     tag = f"v{version}"
-    print(f"Creating git tag: {tag}")
-
-    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {tag}"], cwd=PROJECT_ROOT)
+    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {tag}"], cwd=PROJECT_ROOT)  # noqa: S603 -- trusted release tooling
     print(f"Tag {tag} created. Push with: git push origin {tag}")
 
 
@@ -109,19 +104,19 @@ def show_release_notes(version: str) -> None:
 
 ## Highlights
 
-- 
+-
 
 ## New Features
 
-- 
+-
 
 ## Improvements
 
-- 
+-
 
 ## Bug Fixes
 
-- 
+-
 
 ## Breaking Changes
 

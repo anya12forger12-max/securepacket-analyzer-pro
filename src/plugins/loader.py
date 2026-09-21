@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib
 import importlib.util
 import json
@@ -9,12 +10,14 @@ import logging
 import shutil
 import sys
 import threading
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.plugins.base import PluginBase, PluginMetadata, PluginState
 from src.security.manager import SecurityManager
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -293,8 +296,7 @@ class PluginLoader:
         if not self._version_gte(app_version, metadata.min_app_version):
             return False
         if metadata.max_app_version:
-            if not self._version_lte(app_version, metadata.max_app_version):
-                return False
+            return self._version_lte(app_version, metadata.max_app_version)
         return True
 
     # ------------------------------------------------------------------
@@ -357,10 +359,8 @@ class PluginLoader:
 
         if not self._security.verify_plugin_signature(dest_path):
             logger.warning("Signature verification failed for %s — removing", metadata.name)
-            try:
+            with contextlib.suppress(OSError):
                 shutil.rmtree(dest_path)
-            except OSError:
-                pass
             return None
 
         metadata.checksum = self._compute_directory_checksum(dest_path)

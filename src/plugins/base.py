@@ -228,6 +228,7 @@ class PluginBase(abc.ABC):
         Override to perform additional setup that is only needed while
         the plugin is actively enabled (e.g. subscribing to events).
         """
+        return None
 
     def on_disable(self) -> None:
         """Called when the plugin transitions to the *disabled* state.
@@ -235,8 +236,9 @@ class PluginBase(abc.ABC):
         Override to tear down resources that are only relevant while the
         plugin is enabled (e.g. unsubscribing from events).
         """
+        return None
 
-    def on_config_changed(self, config: dict[str, Any]) -> None:
+    def on_config_changed(self, _config: dict[str, Any]) -> None:
         """Called when the plugin's configuration is updated at runtime.
 
         Parameters
@@ -244,6 +246,7 @@ class PluginBase(abc.ABC):
         config:
             The new configuration dictionary.
         """
+        return None
 
     # ------------------------------------------------------------------
     # Configuration
@@ -257,7 +260,7 @@ class PluginBase(abc.ABC):
         """
         return {}
 
-    def validate_config(self, config: dict[str, Any]) -> list[str]:
+    def validate_config(self, config: dict[str, Any]) -> list[str]:  # noqa: ARG002 -- documented hook contract
         """Validate a candidate configuration dictionary.
 
         Parameters

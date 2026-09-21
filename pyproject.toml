@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "securepacket-analyzer-pro"
-version = "0.1.0"
+version = "0.1.1"
 description = "Professional-grade network packet analysis platform"
 readme = "README.md"
 license = {text = "GPL-3.0-only"}
@@ -38,7 +38,6 @@ dependencies = [
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "pytest-qt>=4.2.0",
     "black>=23.0.0",
     "isort>=5.12.0",
     "ruff>=0.1.0",
@@ -93,10 +92,18 @@ select = [
 ]
 ignore = [
     "T201",  # allow print() during development
+    "RUF001",  # ambiguous unicode in UI strings (en dashes used as ranged labels)
+    "RUF002",  # ambiguous unicode in docstrings (en dashes in prose)
+    "RUF003",  # ambiguous unicode in comments (en dashes in prose)
 ]
+
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]  # allow assert in tests
+# psutil/procfs metrics fallbacks: deliberate bare-except + raw procfs reads
+"src/diagnostics/performance.py" = ["S110", "PTH123", "PTH208"]
+# trusted release tooling: intentionally shells out by PATH
+"scripts/release.py" = ["S607"]
 
 [tool.mypy]
 python_version = "3.12"

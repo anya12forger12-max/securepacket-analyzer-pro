@@ -11,14 +11,16 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum, auto
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.analysis.models import _now_iso
 from src.config.settings import SettingsManager
 from src.security.manager import SecurityManager
 from src.services.event_bus import EventBus, Events
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -262,11 +264,11 @@ class UpdateManager:
             return None
 
         try:
-            request = urllib.request.Request(
+            request = urllib.request.Request(  # noqa: S310 -- URL validated above
                 server_url,
                 headers={"User-Agent": f"SecurePacketAnalyzerPro/{self.get_current_version()}"},
             )
-            with urllib.request.urlopen(request, timeout=15) as response:
+            with urllib.request.urlopen(request, timeout=15) as response:  # noqa: S310 -- URL validated above
                 raw = response.read().decode("utf-8")
             data = json.loads(raw)
         except (urllib.error.URLError, json.JSONDecodeError, OSError) as exc:
@@ -344,14 +346,14 @@ class UpdateManager:
         dest = self._update_dir / f"update_{release.version}.zip"
 
         try:
-            request = urllib.request.Request(
+            request = urllib.request.Request(  # noqa: S310 -- URL validated above
                 release.download_url,
                 headers={"User-Agent": f"SecurePacketAnalyzerPro/{self.get_current_version()}"},
             )
-            with urllib.request.urlopen(request, timeout=60) as response:
+            with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 -- URL validated above
                 total = int(response.headers.get("Content-Length", 0))
                 downloaded = 0
-                with open(dest, "wb") as fh:
+                with dest.open("wb") as fh:
                     while True:
                         chunk = response.read(65536)
                         if not chunk:
@@ -596,7 +598,7 @@ class UpdateManager:
             return False
         try:
             h = hashlib.sha256()
-            with open(file_path, "rb") as fh:
+            with file_path.open("rb") as fh:
                 while True:
                     chunk = fh.read(65536)
                     if not chunk:

@@ -440,11 +440,17 @@ class ConnectionInfo:
 
     def key(self) -> str:
         """Canonical 5-tuple key: ``proto:sip:sport:dip:dport``."""
-        return f"{self.protocol}:{self.source_ip}:{self.source_port}:{self.destination_ip}:{self.destination_port}"
+        return (
+            f"{self.protocol}:{self.source_ip}:{self.source_port}:"
+            f"{self.destination_ip}:{self.destination_port}"
+        )
 
     def reverse_key(self) -> str:
         """The reversed-direction key used to match reply packets."""
-        return f"{self.protocol}:{self.destination_ip}:{self.destination_port}:{self.source_ip}:{self.source_port}"
+        return (
+            f"{self.protocol}:{self.destination_ip}:{self.destination_port}:"
+            f"{self.source_ip}:{self.source_port}"
+        )
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize to a JSON-safe dictionary."""
@@ -733,15 +739,10 @@ class SessionInfo:
         if not self.start_time:
             return True
         try:
-            if self.end_time:
-                ref = datetime.fromisoformat(self.end_time)
-            else:
-                ref = datetime.now(UTC)
+            ref = datetime.fromisoformat(self.end_time) if self.end_time else datetime.now(UTC)
             start = datetime.fromisoformat(self.start_time)
             elapsed = (ref - start).total_seconds()
-            if self.packets == 0 and elapsed > self.timeout:
-                return True
-            return False
+            return bool(self.packets == 0 and elapsed > self.timeout)
         except ValueError:
             return True
 

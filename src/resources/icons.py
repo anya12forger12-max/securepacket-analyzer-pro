@@ -7,10 +7,13 @@ all standard application icon names.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar
 
 from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class IconManager:
@@ -27,7 +30,7 @@ class IconManager:
         _cache: In-memory cache of loaded QIcon objects.
     """
 
-    _STANDARD_ICONS: dict[str, str] = {
+    _STANDARD_ICONS: ClassVar[dict[str, str]] = {
         "home": "\u2302",
         "dashboard": "\u25a3",
         "capture": "\u25cf",
@@ -82,7 +85,7 @@ class IconManager:
         "question": "?",
     }
 
-    _ICON_COLORS: dict[str, QColor] = {
+    _ICON_COLORS: ClassVar[dict[str, QColor]] = {
         "home": QColor("#0078D4"),
         "dashboard": QColor("#0078D4"),
         "capture": QColor("#D32F2F"),
@@ -234,7 +237,7 @@ class IconManager:
             paths: Mapping of pixel sizes to icon file paths.
         """
         self._icon_sets[name] = dict(paths)
-        for size, path in paths.items():
+        for _size, path in paths.items():
             stem = path.stem.lower()
             if stem not in self._registry:
                 self._registry[stem] = path
@@ -259,7 +262,7 @@ class IconManager:
             svg_icon = QIcon(str(path))
             if not svg_icon.isNull():
                 return svg_icon
-        except Exception:
+        except Exception:  # noqa: S110 -- fall back to text icon
             pass
 
         return QIcon()

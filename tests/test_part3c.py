@@ -1,3 +1,4 @@
+# ruff: noqa: E402 -- imports intentionally follow the PySide6 mock
 """Comprehensive tests for Part 3C: plugins, updates, backups, performance, settings."""
 
 from __future__ import annotations
@@ -17,14 +18,16 @@ import pytest
 # Mock PySide6 before any project imports
 # ---------------------------------------------------------------------------
 _mock_qt = MagicMock()
-_mock_qt.QObject = type("QObject", (), {"__init__": lambda self, *a, **kw: None})
-_mock_qt.Signal = lambda *a, **kw: MagicMock()
+_mock_qt.QObject = type("QObject", (), {"__init__": lambda _self, *_a, **_kw: None})
+_mock_qt.Signal = lambda *_a, **_kw: MagicMock()
 sys.modules["PySide6"] = MagicMock()
 sys.modules["PySide6.QtCore"] = _mock_qt
 
 # ---------------------------------------------------------------------------
 # Project imports (safe after PySide6 mock)
 # ---------------------------------------------------------------------------
+import contextlib
+
 from src.config.settings import _VALIDATION_RULES, DEFAULT_CONFIG
 from src.core.backup import BackupEntry, BackupManager, BackupType
 from src.core.updater import UpdateChannel, UpdateManager, UpdateStatus
@@ -51,10 +54,8 @@ from src.services.event_bus import EventBus, Events
 def _reset_event_bus():
     """Reset the EventBus singleton between tests."""
     yield
-    try:
+    with contextlib.suppress(Exception):
         EventBus._instance = None
-    except Exception:
-        pass
 
 
 @pytest.fixture
@@ -117,7 +118,7 @@ def backup_manager(tmp_path):
     sm = MagicMock()
 
     class _FakeSettings:
-        def get(self, key: str, default: Any = None) -> Any:
+        def get(self, _key: str, default: Any = None) -> Any:
             return default
 
         def set(self, key: str, value: Any) -> None:

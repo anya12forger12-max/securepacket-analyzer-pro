@@ -14,12 +14,14 @@ import logging
 import re
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.analysis.reporting_models import ExportFormat, Report
 from src.services.event_bus import EventBus, Events
 from src.utils.paths import AppPaths
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +65,9 @@ class ReportExporter:
     def export(
         self,
         report: Report,
-        format: ExportFormat,
+        format: ExportFormat,  # noqa: A002 -- public API argument name
         output_path: Path | None = None,
-        password: str | None = None,
+        _password: str | None = None,
     ) -> Path:
         """Export a report to the specified format.
 
@@ -343,8 +345,7 @@ class ReportExporter:
         )
         if report.description:
             html += (
-                f'    <p class="report-description">'
-                f"{self._escape_xml(report.description)}</p>\n"
+                f'    <p class="report-description">{self._escape_xml(report.description)}</p>\n'
             )
         html += (
             f'    <div class="metadata" role="contentinfo" '
@@ -573,7 +574,7 @@ class ReportExporter:
     # Filename generation
     # ------------------------------------------------------------------
 
-    def _generate_filename(self, report: Report, format: ExportFormat) -> str:
+    def _generate_filename(self, report: Report, format: ExportFormat) -> str:  # noqa: A002 -- public API argument name
         """Build a sanitised filename: title-timestamp.ext."""
         raw_title = re.sub(r"[^\w\s\-]", "", report.title)
         raw_title = re.sub(r"\s+", "_", raw_title.strip()).strip("_")
@@ -973,9 +974,7 @@ class ReportExporter:
 
         if isinstance(data, dict):
             flat = self._flatten_section_data(data)
-            parts.append(
-                '      <table role="table" ' f'aria-label="{self._escape_xml(label)} data">'
-            )
+            parts.append(f'      <table role="table" aria-label="{self._escape_xml(label)} data">')
             parts.append("        <thead><tr><th>Field</th><th>Value</th></tr></thead>")
             parts.append("        <tbody>")
             for key, val in flat:
@@ -1023,7 +1022,7 @@ class ReportExporter:
                     seen.add(key)
 
         lines: list[str] = []
-        lines.append(f'      <table role="table" ' f'aria-label="{self._escape_xml(label)} data">')
+        lines.append(f'      <table role="table" aria-label="{self._escape_xml(label)} data">')
         lines.append("        <thead><tr>")
         for col in all_keys:
             lines.append(f'          <th scope="col">{self._escape_xml(col)}</th>')

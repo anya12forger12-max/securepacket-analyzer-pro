@@ -30,7 +30,7 @@ except ImportError:
         def __get__(self, instance: Any, owner: type | None = None) -> Any:
             if instance is None:
                 return self
-            return lambda *a, **kw: None
+            return lambda *_a, **_kw: None
 
     class _QObjectStub:
         pass
@@ -47,6 +47,8 @@ except ImportError:
     sys.modules.setdefault("PySide6", types.ModuleType("PySide6"))
     sys.modules["PySide6.QtCore"] = _fake_qtcore
     from PySide6.QtCore import QObject, Signal  # type: ignore[no-redef]
+
+import contextlib
 
 from src.config.settings import SettingsManager
 
@@ -208,10 +210,8 @@ class NotificationManager(QObject):
             if len(self._notifications) > _MAX_NOTIFICATIONS:
                 self._evict()
 
-        try:
+        with contextlib.suppress(Exception):
             self.notification_added.emit(notif)
-        except Exception:
-            pass
 
         logger.info("Notification [%s]: %s – %s", ntype.value, title, message)
         return notif
@@ -298,20 +298,16 @@ class NotificationManager(QObject):
                     notif.dismissed = True
                     break
 
-        try:
+        with contextlib.suppress(Exception):
             self.notification_removed.emit(notification_id)
-        except Exception:
-            pass
 
     def clear(self) -> None:
         """Remove all notifications from memory."""
         with self._lock:
             self._notifications.clear()
 
-        try:
+        with contextlib.suppress(Exception):
             self.notifications_cleared.emit()
-        except Exception:
-            pass
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -326,7 +322,7 @@ class NotificationManager(QObject):
         for predicate in (
             lambda n: n.dismissed,
             lambda n: n.read,
-            lambda n: True,
+            lambda _n: True,
         ):
             while len(self._notifications) > _MAX_NOTIFICATIONS:
                 for idx, notif in enumerate(self._notifications):

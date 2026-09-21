@@ -87,12 +87,18 @@ class DiagnosticsManager:
             return DiagnosticResult(
                 check_name="Python Version",
                 status="warning",
-                message=f"Python {version_str} – recommend upgrading to {_MIN_PYTHON[0]}.{_MIN_PYTHON[1]}+",
+                message=(
+                    f"Python {version_str} – recommend upgrading to "
+                    f"{_MIN_PYTHON[0]}.{_MIN_PYTHON[1]}+"
+                ),
             )
         return DiagnosticResult(
             check_name="Python Version",
             status="fail",
-            message=f"Python {version_str} is too old – minimum {_MIN_PYTHON[0]}.{_MIN_PYTHON[1]} required",
+            message=(
+                f"Python {version_str} is too old – minimum "
+                f"{_MIN_PYTHON[0]}.{_MIN_PYTHON[1]} required"
+            ),
         )
 
     def check_dependencies(self) -> DiagnosticResult:
@@ -390,7 +396,7 @@ class DiagnosticsManager:
     def _available_memory_mb() -> float | None:
         """Return available system memory in megabytes, or *None*."""
         try:
-            with open("/proc/meminfo", encoding="utf-8", errors="ignore") as fh:
+            with open("/proc/meminfo", encoding="utf-8", errors="ignore") as fh:  # noqa: PTH123 -- procfs
                 for line in fh:
                     if line.startswith("MemAvailable:"):
                         parts = line.split()

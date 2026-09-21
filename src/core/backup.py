@@ -340,7 +340,7 @@ class BackupManager:
                         continue
 
                     dest.parent.mkdir(parents=True, exist_ok=True)
-                    with zf.open(member) as src, open(dest, "wb") as dst:
+                    with zf.open(member) as src, dest.open("wb") as dst:
                         shutil.copyfileobj(src, dst)
         except (OSError, zipfile.BadZipFile) as exc:
             logger.error("Backup restore failed: %s", exc)
@@ -669,7 +669,7 @@ class BackupManager:
         import hashlib as _hashlib
 
         h = _hashlib.sha256()
-        with open(file_path, "rb") as fh:
+        with Path(file_path).open("rb") as fh:
             while True:
                 chunk = fh.read(65536)
                 if not chunk:
